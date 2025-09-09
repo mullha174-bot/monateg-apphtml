@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon@teg - Rewards App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src='https://libtl.com/sdk.js' data-zone='9796682' data-sdk='show_9796682'></script>
+    <style>
+        :root {
+            --primary-color: #0088cc;
+            --secondary-color: #060707;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --success-color: #28a745;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --border-color: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #0d0c0c;
+            --text-color: #212529;
+            --card-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 60px;
+        }
+
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-color: var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main-content {
+            padding: 15px;
+        }
+
+        .reward-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .reward-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .withdraw-option {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .withdraw-option:hover {
+            background-color: rgba(0, 136, 204, 0.1);
+        }
+
+        .history-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+        }
+
+        .leaderboard-item {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 5px 0;
+            background-color: var(--card-bg);
+        }
+
+        .top-rank {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .theme-selector {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mission-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .progress {
+            height: 10px;
+            margin: 10px 0;
+        }
+
+        .help-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .help-item:last-child {
+            border-bottom: none;
+        }
+
+        .social-share {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .facebook { background-color: #3b5998; }
+        .whatsapp { background-color: #25D366; }
+        .telegram { background-color: #0088cc; }
+        .twitter { background-color: #1DA1F2; }
+
+        .menu-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(0, 136, 204, 0.1);
+        }
+
+        .language-selector {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            padding: 15px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .offcanvas-body {
+            padding: 0;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .video-card {
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .video-title {
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        .reward-amount {
+            padding: 0 15px 15px;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .admin-control {
+            margin-bottom: 15px;
+        }
+
+        .video-upload-btn {
+            margin-top: 10px;
+        }
+        .d-none {
+            display: none !important;
+        }
+        #methodDetails.d-none {
+            display: none !important;
+        }
+        #adminMenuItem {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand mx-auto" href="#">
+                <i class="fab fa-bitcoin"></i> Mon@teg
+            </a>
+            <div class="d-flex">
+                <a class="nav-link position-relative me-3" href="#" id="notificationIcon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge d-none" id="notificationCount">0</span>
+                </a>
+                <a class="nav-link" href="#" id="themeToggle" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Menu -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Mon@teg</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" title="Close menu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="section-title">Menu</div>
+            <div class="menu-item" onclick="showSection('home')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="menu-item" onclick="showSection('mission')">
+                <i class="fas fa-tasks"></i> Missions
+            </div>
+            <div class="menu-item" onclick="showSection('withdraw')">
+                <i class="fas fa-money-bill-wave"></i> Withdraw
+            </div>
+            <div class="menu-item" onclick="showSection('referral')">
+                <i class="fas fa-users"></i> Referral
+            </div>
+            <div class="menu-item" onclick="showSection('videos')">
+                <i class="fas fa-video"></i> Videos
+            </div>
+            <div class="menu-item" onclick="showSection('help')">
+                <i class="fas fa-question-circle"></i> Help
+            </div>
+            <div class="menu-item" id="adminMenuItem" onclick="showSection('admin')">
+                <i class="fas fa-cog"></i> Admin
+            </div>
+            
+            <div class="section-title">Language</div>
+            <div class="language-selector">
+                <label for="languageSelect" class="visually-hidden">Select Language</label>
+                <select class="form-select" id="languageSelect" onchange="changeLanguage()" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="ar">العربية</option>
+                    <option value="es">Español</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        <!-- Home Section -->
+        <div id="home" class="content-section active">
+            <div class="d-flex justify-content-between align-items-center my-3">
+                <h4>Balance: <span id="userBalance">0.0000</span> USDT</h4>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <button class="btn reward-btn" onclick="showAd('BitcoinBot', sdkConfig.BitcoinBot)">
+                        <i class="fab fa-bitcoin"></i> BitcoinBot<br>
+                        <small>Reward: <span id="rewardBitcoinBot">0.0005</span> USDT</small>
+                    </button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button class="btn reward-btn" onclick="showAd('RemoteRetrieval', sdkConfig.RemoteRetrieval)">
+                        <i class="fas fa-desktop"></i> RemoteRetrieval<br>
+                        <small>Reward: <span id="rewardRemoteRetrieval">0.0005</span> USDT</small>
+                    </button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button class="btn reward-btn" onclick="showRewardedInterstitial()">
+                        <i class="fas fa-ad"></i> Rewarded Interstitial<br>
+                        <small>Reward: <span id="rewardInterstitial">0.0005</span> USDT</small>
+                    </button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button class="btn reward-btn" onclick="showRewardedPopup()">
+                        <i class="fas fa-popup"></i> Rewarded Popup<br>
+                        <small>Reward: <span id="rewardPopup">0.0015</span> USDT</small>
+                    </button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button class="btn reward-btn" onclick="showInAppInterstitial()">
+                        <i class="fas fa-play-circle"></i> In-app Interstitial<br>
+                        <small>Reward: <span id="rewardInApp">0.0008</span> USDT</small>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Reward History</h5>
+                <div id="rewardHistory" class="list-group">
+                    <!-- Will be added dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Section -->
+        <div id="mission" class="content-section">
+            <h4>Daily Missions</h4>
+            <div id="missionList">
+                <!-- Missions will be added dynamically -->
+            </div>
+        </div>
+
+        <!-- Withdraw Section -->
+        <div id="withdraw" class="content-section">
+            <h4>Withdraw</h4>
+            <div class="mb-3">
+                <label for="withdrawAmount" class="form-label">Amount (USDT)</label>
+                <input type="number" class="form-control" id="withdrawAmount" placeholder="0.00" step="0.01">
+            </div>
+            
+            <h5>Select Method</h5>
+            <div class="withdraw-option" onclick="selectWithdrawMethod('bkash')">
+                <i class="fas fa-mobile-alt"></i> bKash
+            </div>
+            <div class="withdraw-option" onclick="selectWithdrawMethod('nagad')">
+                <i class="fas fa-wallet"></i> Nagad
+            </div>
+            <div class="withdraw-option" onclick="selectWithdrawMethod('usdt')">
+                <i class="fab fa-bitcoin"></i> USDT (TRC20)
+            </div>
+            
+            <div id="methodDetails" class="mt-3 d-none">
+                <div class="mb-3">
+                    <label id="methodLabel" class="form-label"></label>
+                    <input type="text" class="form-control" id="methodInput">
+                </div>
+                <button class="btn btn-success w-100" onclick="processWithdrawal()">Withdraw</button>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Withdrawal History</h5>
+                <div id="withdrawHistory">
+                    <!-- Will be added dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral Section -->
+        <div id="referral" class="content-section">
+            <h4>Invite Friends & Earn <span id="referralRewardAmount">0.01</span> USDT</h4>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p>Your referral link:</p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="referralLink" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyReferralLink()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="small">You will get <span id="referralRewardText">0.01</span> USDT for each successful referral</p>
+                </div>
+            </div>
+            
+            <div class="social-share">
+                <div class="social-icon facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="social-icon whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="social-icon telegram" onclick="shareOnTelegram()">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+                <div class="social-icon twitter" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i>
+                </div>
+            </div>
+            
+            <h5>Your Referrals</h5>
+            <div id="referralList">
+                <!-- Will be added dynamically -->
+            </div>
+        </div>
+
+        <!-- Videos Section -->
+        <div id="videos" class="content-section">
+            <h4>Tutorial Videos</h4>
+            <p>Watch videos to learn how to use the app and earn USDT</p>
+            
+            <div id="videoList">
+                <!-- Videos will be added dynamically -->
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div id="help" class="content-section">
+            <h4>Help Center</h4>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Ask a Question</h5>
+                    <div class="mb-3">
+                        <label for="helpSubject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="helpSubject" placeholder="Question subject">
+                    </div>
+                    <div class="mb-3">
+                        <label for="helpMessage" class="form-label">Details</label>
+                        <textarea class="form-control" id="helpMessage" rows="3" placeholder="Describe your question or problem"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="sendHelpRequest()">Submit Question</button>
+                </div>
+            </div>
+            
+            <h5>Frequently Asked Questions</h5>
+            <div class="card">
+                <div class="card-body">
+                    <div class="help-item" onclick="toggleFAQ(1)">
+                        <h6>How can I withdraw money?</h6>
+                        <div id="faq1" class="d-none">
+                            <p>Go to the Withdraw tab to withdraw money through bKash, Nagad or USDT. Minimum withdrawal amount is 1 USDT.</p>
+                        </div>
+                    </div>
+                    <div class="help-item" onclick="toggleFAQ(2)">
+                        <h6>How does referral earning work?</h6>
+                        <div id="faq2" class="d-none">
+                            <p>When someone registers using your referral link, you will get a 0.01 USDT bonus. When they earn by watching ads, you will also get a percentage of their earnings.</p>
+                        </div>
+                    </div>
+                    <div class="help-item" onclick="toggleFAQ(3)">
+                        <h6>How long does it take to get reward after watching an ad?</h6>
+                        <div id="faq3" class="d-none">
+                            <p>After watching an ad, the reward is usually added to your account within 1-2 minutes. If it doesn't arrive after 5 minutes, please contact support.</p>
+                        </div>
+                    </div>
+                    <div class="help-item" onclick="toggleFAQ(4)">
+                        <h6>How long does withdrawal take?</h6>
+                        <div id="faq4" class="d-none">
+                            <p>After requesting a withdrawal, you will usually receive the money within 24-48 hours. It may take longer on bank holidays.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile" class="content-section">
+            <div class="text-center">
+                <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile">
+                <h4 id="userName">Telegram User</h4>
+                <p id="userTelegramId"></p>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Statistics</h5>
+                    <p>Total Earnings: <span id="totalEarnings">0.0000</span> USDT</p>
+                    <p>Referrals: <span id="totalReferrals">0</span></p>
+                    <p>Completed Offers: <span id="totalOffers">0</span></p>
+                    <p>Level: <span id="userLevel">1</span></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5>Profile Settings</h5>
+                    <div class="mb-3">
+                        <label for="userNameInput" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="userNameInput">
+                    </div>
+                    <button class="btn btn-primary" onclick="updateProfile()">Update</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin" class="content-section">
+            <h4>Admin Panel</h4>
+            
+            <div class="card mb-3">
+                <div class="card-header">Reward Configuration</div>
+                <div class="card-body">
+                    <div class="admin-control">
+                        <label class="form-label">Referral Reward (USDT)</label>
+                        <input type="number" class="form-control" id="adminReferralReward" value="0.01" step="0.001">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="admin-control">
+                                <label class="form-label">BitcoinBot Reward (USDT)</label>
+                                <input type="number" class="form-control" id="adminBitcoinBotReward" value="0.0005" step="0.0001">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="admin-control">
+                                <label class="form-label">RemoteRetrieval Reward (USDT)</label>
+                                <input type="number" class="form-control" id="adminRemoteRetrievalReward" value="0.0005" step="0.0001">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="admin-control">
+                                <label class="form-label">Rewarded Interstitial Reward (USDT)</label>
+                                <input type="number" class="form-control" id="adminInterstitialReward" value="0.0005" step="0.0001">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-control">
+                                <label class="form-label">Rewarded Popup Reward (USDT)</label>
+                                <input type="number" class="form-control" id="adminPopupReward" value="0.0015" step="0.0001">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-control">
+                                <label class="form-label">In-app Interstitial Reward (USDT)</label>
+                                <input type="number" class="form-control" id="adminInAppReward" value="0.0008" step="0.0001">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="saveRewardConfig()">Save Rewards</button>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header">Video Management</div>
+                <div class="card-body">
+                    <div class="admin-control">
+                        <label class="form-label">Video Title</label>
+                        <input type="text" class="form-control" id="videoTitle">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">Video URL</label>
+                        <input type="url" class="form-control" id="videoUrl" placeholder="https://www.youtube.com/embed/...">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">Thumbnail URL</label>
+                        <input type="url" class="form-control" id="videoThumbnail" placeholder="https://example.com/thumbnail.jpg">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">Reward (USDT)</label>
+                        <input type="number" class="form-control" id="videoReward" value="0.01" step="0.001">
+                    </div>
+                    <button class="btn btn-primary video-upload-btn" onclick="addVideo()">Add Video</button>
+                    
+                    <div class="mt-4">
+                        <h5>Active Videos</h5>
+                        <div id="adminVideoList">
+                            <!-- Videos will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header">SDK Configuration</div>
+                <div class="card-body">
+                    <div class="admin-control">
+                        <label class="form-label">BitcoinBot SDK</label>
+                        <input type="text" class="form-control" id="sdkBitcoinBot" value="https://otieu.com/4/9796638">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">RemoteRetrieval SDK</label>
+                        <input type="text" class="form-control" id="sdkRemoteRetrieval" value="https://otieu.com/4/9796638">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">Rewarded Interstitial</label>
+                        <input type="text" class="form-control" id="sdkRewardedInterstitial" value="show_9796682">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">Rewarded Popup</label>
+                        <input type="text" class="form-control" id="sdkRewardedPopup" value="show_9796682('pop')">
+                    </div>
+                    <div class="admin-control">
+                        <label class="form-label">In-app Interstitial</label>
+                        <input type="text" class="form-control" id="sdkInAppInterstitial" value="show_9796682({type: 'inApp', inAppSettings: {frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false}})">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSdkConfig()">Save SDK</button>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header">Help Requests</div>
+                <div class="card-body">
+                    <div id="helpRequests">
+                        <!-- Help requests will be added dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header">Withdrawal Requests</div>
+                <div class="card-body">
+                    <div id="withdrawalRequests">
+                        <!-- Withdrawal requests will be added dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">System Status</div>
+                <div class="card-body">
+                    <p>Active Users: <span id="activeUsers">0</span></p>
+                    <p>Total Rewards Given: <span id="totalRewards">0</span> USDT</p>
+                    <p>Total Withdrawals: <span id="totalWithdrawals">0</span> USDT</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal fade" id="videoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoModalTitle">Video</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ratio ratio-16x9">
+                        <iframe id="videoPlayer" src="" allowfullscreen title="Tutorial Video Player"></iframe>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-success w-100" onclick="completeVideo()">Complete after watching</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Close"></button>
+                </div>
+                <div class="modal-body" id="notificationList">
+                    <!-- Notifications will be added dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Telegram WebApp Initialization
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        // API Base URL (Replace with your server address)
+        const API_BASE = 'https://your-api-domain.com/api';
+        
+        // User Data
+        let userData = {
+            id: tg.initDataUnsafe.user?.id || Math.floor(Math.random() * 1000000),
+            first_name: tg.initDataUnsafe.user?.first_name || "Telegram",
+            last_name: tg.initDataUnsafe.user?.last_name || "User",
+            username: tg.initDataUnsafe.user?.username || "telegram_user",
+            balance: 0,
+            theme: 'light',
+            referrals: [],
+            offerCompletions: [],
+            withdrawals: [],
+            level: 1,
+            experience: 0,
+            notifications: [],
+            language: 'en',
+            watchedVideos: []
+        };
+        
+        // Reward Configuration
+        let rewardConfig = {
+            referral: 0.01,
+            BitcoinBot: 0.0005,
+            RemoteRetrieval: 0.0005,
+            RewardedInterstitial: 0.0005,
+            RewardedPopup: 0.0015,
+            InAppInterstitial: 0.0008
+        };
+        
+        // SDK Configuration
+        let sdkConfig = {
+            BitcoinBot: "https://otieu.com/4/9796638",
+            RemoteRetrieval: "https://otieu.com/4/9796638",
+            RewardedInterstitial: "show_9796682",
+            RewardedPopup: "show_9796682('pop')",
+            InAppInterstitial: "show_9796682({type: 'inApp', inAppSettings: {frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false}})"
+        };
+        
+        // Video Data
+        let videos = [
+            {
+                id: 1,
+                title: "How to use the app",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                thumbnail: "https://via.placeholder.com/300x180",
+                reward: 0.01
+            },
+            {
+                id: 2,
+                title: "How to withdraw money",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                thumbnail: "https://via.placeholder.com/300x180",
+                reward: 0.01
+            }
+        ];
+
+        // Mission Data
+        let missions = [
+            {
+                id: 1,
+                title: "Login daily",
+                description: "Login to the app daily to get 0.001 USDT",
+                reward: 0.001,
+                type: "daily",
+                completed: false
+            },
+            {
+                id: 2,
+                title: "Watch 3 ads",
+                description: "Watch 3 different ads to get 0.005 USDT bonus",
+                reward: 0.005,
+                type: "offer",
+                target: 3,
+                progress: 0,
+                completed: false
+            },
+            {
+                id: 3,
+                title: "Add 2 referrals",
+                description: "Add 2 referrals to get 0.02 USDT bonus",
+                reward: 0.02,
+                type: "referral",
+                target: 2,
+                progress: 0,
+                completed: false
+            }
+        ];
+
+        // Language Data
+        const translations = {
+            en: {
+                // Menu items
+                home: "Home",
+                mission: "Missions",
+                withdraw: "Withdraw",
+                referral: "Referral",
+                help: "Help",
+                profile: "Profile",
+                admin: "Admin",
+                
+                // Common terms
+                balance: "Balance",
+                rewards: "Rewards",
+                history: "History",
+                leaderboard: "Leaderboard",
+                
+                // Home section
+                rewardHistory: "Reward History",
+                
+                // Withdraw section
+                selectMethod: "Select Method",
+                withdrawHistory: "Withdrawal History",
+                
+                // Referral section
+                inviteFriends: "Invite Friends & Earn",
+                yourReferralLink: "Your referral link",
+                yourReferrals: "Your Referrals",
+                
+                // Videos section
+                tutorialVideos: "Tutorial Videos",
+                watchAndEarn: "Watch videos to learn how to use the app and earn USDT",
+                
+                // Help section
+                helpCenter: "Help Center",
+                askQuestion: "Ask a Question",
+                subject: "Subject",
+                details: "Details",
+                submitQuestion: "Submit Question",
+                faq: "Frequently Asked Questions",
+                
+                // Profile section
+                statistics: "Statistics",
+                totalEarnings: "Total Earnings",
+                referrals: "Referrals",
+                completedOffers: "Completed Offers",
+                level: "Level",
+                profileSettings: "Profile Settings",
+                name: "Name",
+                update: "Update",
+                
+                // Admin section
+                rewardConfiguration: "Reward Configuration",
+                referralReward: "Referral Reward",
+                videoManagement: "Video Management",
+                videoTitle: "Video Title",
+                videoUrl: "Video URL",
+                thumbnailUrl: "Thumbnail URL",
+                activeVideos: "Active Videos",
+                sdkConfiguration: "SDK Configuration",
+                helpRequests: "Help Requests",
+                withdrawalRequests: "Withdrawal Requests",
+                systemStatus: "System Status",
+                activeUsers: "Active Users",
+                totalRewardsGiven: "Total Rewards Given",
+                totalWithdrawals: "Total Withdrawals",
+                saveRewards: "Save Rewards",
+                addVideo: "Add Video",
+                delete: "Delete",
+                saveSdk: "Save SDK"
+            },
+            bn: {
+                home: "হোম",
+                mission: "মিশন",
+                withdraw: "উত্তোলন",
+                referral: "রেফার",
+                help: "হেল্প",
+                profile: "প্রোফাইল",
+                admin: "এডমিন",
+                balance: "ব্যালেন্স",
+                rewards: "পুরস্কার",
+                history: "হিস্টরি",
+                leaderboard: "লিডারবোর্ড",
+                rewardHistory: "রিওয়ার্ড হিস্টরি",
+                selectMethod: "পদ্ধতি নির্বাচন করুন",
+                withdrawHistory: "উত্তোলন ইতিহাস",
+                inviteFriends: "বন্ধুকে আমন্ত্রণ করুন এবং উপার্জন করুন",
+                yourReferralLink: "আপনার রেফারেল লিংক",
+                yourReferrals: "আপনার রেফারেলগুলি",
+                tutorialVideos: "টিউটোরিয়াল ভিডিও",
+                watchAndEarn: "ভিডিও দেখে অ্যাপ ব্যবহার শিখুন এবং USDT উপার্জন করুন",
+                helpCenter: "সহায়তা কেন্দ্র",
+                askQuestion: "আপনার প্রশ্ন জিজ্ঞাসা করুন",
+                subject: "বিষয়",
+                details: "বিস্তারিত",
+                submitQuestion: "প্রশ্ন জমা দিন",
+                faq: "সচরাচর জিজ্ঞাসিত প্রশ্ন",
+                statistics: "স্ট্যাটিস্টিক্স",
+                totalEarnings: "মোট আয়",
+                referrals: "রেফারেল",
+                completedOffers: "সম্পন্ন অফার",
+                level: "লেভেল",
+                profileSettings: "প্রোফাইল সেটিংস",
+                name: "নাম",
+                update: "আপডেট করুন",
+                rewardConfiguration: "পুরস্কার কনফিগারেশন",
+                referralReward: "রেফারেল পুরস্কার",
+                videoManagement: "ভিডিও ম্যানেজমেন্ট",
+                videoTitle: "ভিডিও টাইটেল",
+                videoUrl: "ভিডিও URL",
+                thumbnailUrl: "থাম্বনেইল URL",
+                activeVideos: "সক্রিয় ভিডিওগুলি",
+                sdkConfiguration: "SDK কনফিগারেশন",
+                helpRequests: "সহায়তা অনুরোধ",
+                withdrawalRequests: "উত্তোলন অনুরোধ",
+                systemStatus: "সিস্টেম স্ট্যাটাস",
+                activeUsers: "সক্রিয় ব্যবহারকারী",
+                totalRewardsGiven: "মোট প্রদত্ত রিওয়ার্ড",
+                totalWithdrawals: "মোট উত্তোলন",
+                saveRewards: "পুরস্কার সংরক্ষণ করুন",
+                addVideo: "ভিডিও যোগ করুন",
+                delete: "মুছুন",
+                saveSdk: "SDK সংরক্ষণ করুন"
+            },
+            hi: {
+                home: "होम",
+                mission: "मिशन",
+                withdraw: "निकासी",
+                referral: "रेफरल",
+                help: "मदद",
+                profile: "प्रोफाइल",
+                admin: "व्यवस्थापक"
+            },
+            ar: {
+                home: "الصفحة الرئيسية",
+                mission: "المهمة",
+                withdraw: "سحب",
+                referral: "الإحالة",
+                help: "مساعدة",
+                profile: "الملف الشخصي",
+                admin: "المشرف"
+            },
+            es: {
+                home: "Inicio",
+                mission: "Misión",
+                withdraw: "Retirar",
+                referral: "Referido",
+                help: "Ayuda",
+                profile: "Perfil",
+                admin: "Administrador"
+            }
+        };
+
+        // App Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+        
+        // App Initialization Function
+        async function initApp() {
+            await loadUserData();
+            setupTheme();
+            updateUI();
+            loadMissions();
+            loadVideos();
+            checkNotifications();
+            loadHelpRequests();
+            
+            // Update profile information
+            document.getElementById('userName').textContent = `${userData.first_name} ${userData.last_name}`;
+            document.getElementById('userTelegramId').textContent = `@${userData.username}`;
+            document.getElementById('userNameInput').value = `${userData.first_name} ${userData.last_name}`;
+            document.getElementById('referralLink').value = `https://t.me/your_bot?start=${userData.id}`;
+            
+            // Admin tab only for admins
+            if (userData.id == 8457318925) { // Your Telegram ID
+                document.getElementById('adminMenuItem').style.display = 'block';
+                loadAdminData();
+            }
+            
+            // Set language
+            document.getElementById('languageSelect').value = userData.language;
+            
+            // Translate UI
+            translateUI(userData.language);
+            
+            // Check referral
+            checkReferral();
+        }
+        
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Close sidebar
+            const sidebar = document.getElementById('sidebarMenu');
+            const bsSidebar = bootstrap.Offcanvas.getInstance(sidebar);
+            bsSidebar.hide();
+        }
+        
+        // Change language
+        async function changeLanguage() {
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            userData.language = selectedLanguage;
+            
+            // Save language preference via API
+            await apiCall('/user/update-language', 'POST', {
+                userId: userData.id,
+                language: selectedLanguage
+            });
+            
+            // Update UI with new language
+            translateUI(selectedLanguage);
+            saveUserData();
+        }
+        
+        // Translate UI elements
+        function translateUI(language) {
+            const langData = translations[language] || translations['en'];
+            
+            // Translate menu items
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (langData[key]) {
+                    element.textContent = langData[key];
+                }
+            });
+            
+            // Translate section titles
+            const sections = {
+                'home': 'home',
+                'mission': 'mission',
+                'withdraw': 'withdraw',
+                'referral': 'referral',
+                'videos': 'tutorialVideos',
+                'help': 'helpCenter',
+                'profile': 'profile',
+                'admin': 'admin'
+            };
+            
+            for (const [sectionId, translationKey] of Object.entries(sections)) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const title = section.querySelector('h4');
+                    if (title && langData[translationKey]) {
+                        title.textContent = langData[translationKey];
+                    }
+                }
+            }
+            
+            // Translate other UI elements
+            const elementsToTranslate = {
+                'userBalanceLabel': 'balance',
+                'rewardHistoryTitle': 'rewardHistory',
+                'withdrawAmountLabel': 'amount',
+                'selectMethodTitle': 'selectMethod',
+                'withdrawHistoryTitle': 'withdrawHistory',
+                'inviteFriendsTitle': 'inviteFriends',
+                'yourReferralLinkText': 'yourReferralLink',
+                'yourReferralsTitle': 'yourReferrals',
+                'watchAndEarnText': 'watchAndEarn',
+                'askQuestionTitle': 'askQuestion',
+                'subjectLabel': 'subject',
+                'detailsLabel': 'details',
+                'submitQuestionButton': 'submitQuestion',
+                'faqTitle': 'faq',
+                'statisticsTitle': 'statistics',
+                'totalEarningsText': 'totalEarnings',
+                'referralsText': 'referrals',
+                'completedOffersText': 'completedOffers',
+                'levelText': 'level',
+                'profileSettingsTitle': 'profileSettings',
+                'nameLabel': 'name',
+                'updateButton': 'update'
+            };
+            
+            for (const [elementId, translationKey] of Object.entries(elementsToTranslate)) {
+                const element = document.getElementById(elementId);
+                if (element && langData[translationKey]) {
+                    element.textContent = langData[translationKey];
+                }
+            }
+        }
+        
+        // API Call Function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userData.id}`
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                // Fallback to localStorage if API fails
+                return { success: false, error: 'API connection failed' };
+            }
+        }
+        
+        // Load user data
+        async function loadUserData() {
+            const response = await apiCall(`/user/${userData.id}`);
+            
+            if (response.success) {
+                // Load data from API
+                Object.assign(userData, response.data);
+            } else {
+                // Load data from localStorage (for demo only)
+                const savedData = localStorage.getItem('userData_' + userData.id);
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    userData.balance = parsedData.balance || 0;
+                    userData.theme = parsedData.theme || 'light';
+                    userData.referrals = parsedData.referrals || [];
+                    userData.offerCompletions = parsedData.offerCompletions || [];
+                    userData.withdrawals = parsedData.withdrawals || [];
+                    userData.level = parsedData.level || 1;
+                    userData.experience = parsedData.experience || 0;
+                    userData.notifications = parsedData.notifications || [];
+                    userData.language = parsedData.language || 'en';
+                    userData.watchedVideos = parsedData.watchedVideos || [];
+                }
+                
+                // Register user with API
+                await apiCall('/user/register', 'POST', {
+                    id: userData.id,
+                    first_name: userData.first_name,
+                    last_name: userData.last_name,
+                    username: userData.username
+                });
+            }
+            
+            // Load reward configuration
+            const savedRewardConfig = localStorage.getItem('rewardConfig');
+            if (savedRewardConfig) {
+                rewardConfig = JSON.parse(savedRewardConfig);
+            }
+            
+            // Load SDK configuration
+            const savedSdkConfig = localStorage.getItem('sdkConfig');
+            if (savedSdkConfig) {
+                sdkConfig = JSON.parse(savedSdkConfig);
+            }
+            
+            // Load video data
+            const savedVideos = localStorage.getItem('videos');
+            if (savedVideos) {
+                videos = JSON.parse(savedVideos);
+            }
+            
+            // Update UI
+            updateRewardDisplay();
+        }
+        
+        // Load admin data
+        function loadAdminData() {
+            // Fill admin forms
+            document.getElementById('adminReferralReward').value = rewardConfig.referral;
+            document.getElementById('adminBitcoinBotReward').value = rewardConfig.BitcoinBot;
+            document.getElementById('adminRemoteRetrievalReward').value = rewardConfig.RemoteRetrieval;
+            document.getElementById('adminInterstitialReward').value = rewardConfig.RewardedInterstitial;
+            document.getElementById('adminPopupReward').value = rewardConfig.RewardedPopup;
+            document.getElementById('adminInAppReward').value = rewardConfig.InAppInterstitial;
+            
+            // Fill SDK forms
+            document.getElementById('sdkBitcoinBot').value = sdkConfig.BitcoinBot;
+            document.getElementById('sdkRemoteRetrieval').value = sdkConfig.RemoteRetrieval;
+            document.getElementById('sdkRewardedInterstitial').value = sdkConfig.RewardedInterstitial;
+            document.getElementById('sdkRewardedPopup').value = sdkConfig.RewardedPopup;
+            document.getElementById('sdkInAppInterstitial').value = sdkConfig.InAppInterstitial;
+            
+            // Load video list
+            loadAdminVideoList();
+        }
+        
+        // Save user data
+        async function saveUserData() {
+            // Save data to API
+            const response = await apiCall('/user/update', 'POST', userData);
+            
+            if (!response.success) {
+                // Fallback to localStorage if API fails
+                localStorage.setItem('userData_' + userData.id, JSON.stringify(userData));
+            }
+        }
+        
+        // Setup theme
+        function setupTheme() {
+            document.body.setAttribute('data-theme', userData.theme);
+            
+            const themeIcon = document.getElementById('themeToggle').querySelector('i');
+            themeIcon.className = userData.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        
+        // Toggle theme
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            userData.theme = userData.theme === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', userData.theme);
+            
+            const themeIcon = this.querySelector('i');
+            themeIcon.className = userData.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            
+            saveUserData();
+        });
+        
+        // Update reward display
+        function updateRewardDisplay() {
+            document.getElementById('rewardBitcoinBot').textContent = rewardConfig.BitcoinBot;
+            document.getElementById('rewardRemoteRetrieval').textContent = rewardConfig.RemoteRetrieval;
+            document.getElementById('rewardInterstitial').textContent = rewardConfig.RewardedInterstitial;
+            document.getElementById('rewardPopup').textContent = rewardConfig.RewardedPopup;
+            document.getElementById('rewardInApp').textContent = rewardConfig.InAppInterstitial;
+            document.getElementById('referralRewardAmount').textContent = rewardConfig.referral;
+            document.getElementById('referralRewardText').textContent = rewardConfig.referral;
+        }
+        
+        // Load videos
+        function loadVideos() {
+            const videoList = document.getElementById('videoList');
+            videoList.innerHTML = '';
+            
+            videos.forEach(video => {
+                const isWatched = userData.watchedVideos.includes(video.id);
+                
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <img src="${video.thumbnail}" class="video-thumbnail" onclick="playVideo(${video.id})" ${isWatched ? 'style="opacity: 0.6;"' : ''}>
+                    <div class="video-title">${video.title}</div>
+                    <div class="reward-amount">Reward: ${video.reward} USDT</div>
+                    ${isWatched ? '<div class="px-3 pb-3"><span class="badge bg-success">Watched</span></div>' : ''}
+                `;
+                videoList.appendChild(videoCard);
+            });
+        }
+        
+        // Load admin video list
+        function loadAdminVideoList() {
+            const adminVideoList = document.getElementById('adminVideoList');
+            adminVideoList.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'admin-control';
+                videoItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${video.title} (${video.reward} USDT)</span>
+                        <button class="btn btn-sm btn-danger" onclick="deleteVideo(${video.id})">Delete</button>
+                    </div>
+                `;
+                adminVideoList.appendChild(videoItem);
+            });
+        }
+        
+        // Play video
+        function playVideo(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            
+            if (!video) return;
+            
+            // If already watched
+            if (userData.watchedVideos.includes(videoId)) {
+                tg.showPopup({
+                    title: 'Already Watched',
+                    message: 'You have already watched this video.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            // Set video modal
+            document.getElementById('videoModalTitle').textContent = video.title;
+            document.getElementById('videoPlayer').src = video.url;
+            
+            // Show video modal
+            const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+            videoModal.show();
+            
+            // Save video ID
+            document.getElementById('videoPlayer').dataset.videoId = videoId;
+        }
+        
+        // Complete video
+        function completeVideo() {
+            const videoId = parseInt(document.getElementById('videoPlayer').dataset.videoId);
+            const video = videos.find(v => v.id === videoId);
+            
+            if (!video) return;
+            
+            // Mark video as watched
+            userData.watchedVideos.push(videoId);
+            
+            // Add reward
+            userData.balance += video.reward;
+            userData.experience += video.reward * 100;
+            
+            userData.offerCompletions.push({
+                offer: `Video: ${video.title}`,
+                amount: video.reward,
+                date: new Date().toISOString()
+            });
+            
+            updateUI();
+            saveUserData();
+            
+            // Close video modal
+            const videoModal = bootstrap.Modal.getInstance(document.getElementById('videoModal'));
+            videoModal.hide();
+            
+            // Add notification
+            addNotification('Video Reward!', `You received ${video.reward} USDT for watching "${video.title}" video.`);
+            
+            tg.showPopup({
+                title: 'Congratulations!',
+                message: `You received ${video.reward} USDT for watching the video.`,
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Add video (Admin)
+        function addVideo() {
+            const title = document.getElementById('videoTitle').value;
+            const url = document.getElementById('videoUrl').value;
+            const thumbnail = document.getElementById('videoThumbnail').value;
+            const reward = parseFloat(document.getElementById('videoReward').value);
+            
+            if (!title || !url || !thumbnail || !reward) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Please fill all fields.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            const newVideo = {
+                id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
+                title: title,
+                url: url,
+                thumbnail: thumbnail,
+                reward: reward
+            };
+            
+            videos.push(newVideo);
+            
+            // Save to localStorage
+            localStorage.setItem('videos', JSON.stringify(videos));
+            
+            // Update video lists
+            loadVideos();
+            loadAdminVideoList();
+            
+            // Reset form
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoUrl').value = '';
+            document.getElementById('videoThumbnail').value = '';
+            document.getElementById('videoReward').value = '0.01';
+            
+            tg.showPopup({
+                title: 'Success',
+                message: 'Video added successfully.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Delete video (Admin)
+        function deleteVideo(videoId) {
+            videos = videos.filter(v => v.id !== videoId);
+            
+            // Save to localStorage
+            localStorage.setItem('videos', JSON.stringify(videos));
+            
+            // Update video lists
+            loadVideos();
+            loadAdminVideoList();
+            
+            tg.showPopup({
+                title: 'Success',
+                message: 'Video deleted successfully.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Save reward configuration (Admin)
+        function saveRewardConfig() {
+            rewardConfig.referral = parseFloat(document.getElementById('adminReferralReward').value);
+            rewardConfig.BitcoinBot = parseFloat(document.getElementById('adminBitcoinBotReward').value);
+            rewardConfig.RemoteRetrieval = parseFloat(document.getElementById('adminRemoteRetrievalReward').value);
+            rewardConfig.RewardedInterstitial = parseFloat(document.getElementById('adminInterstitialReward').value);
+            rewardConfig.RewardedPopup = parseFloat(document.getElementById('adminPopupReward').value);
+            rewardConfig.InAppInterstitial = parseFloat(document.getElementById('adminInAppReward').value);
+            
+            // Save to API
+            apiCall('/admin/reward-config', 'POST', rewardConfig);
+            
+            // Save to localStorage
+            localStorage.setItem('rewardConfig', JSON.stringify(rewardConfig));
+            
+            // Update UI
+            updateRewardDisplay();
+            
+            tg.showPopup({
+                title: 'Saved',
+                message: 'Reward configuration saved successfully.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Save SDK configuration (Admin)
+        function saveSdkConfig() {
+            sdkConfig.BitcoinBot = document.getElementById('sdkBitcoinBot').value;
+            sdkConfig.RemoteRetrieval = document.getElementById('sdkRemoteRetrieval').value;
+            sdkConfig.RewardedInterstitial = document.getElementById('sdkRewardedInterstitial').value;
+            sdkConfig.RewardedPopup = document.getElementById('sdkRewardedPopup').value;
+            sdkConfig.InAppInterstitial = document.getElementById('sdkInAppInterstitial').value;
+            
+            // Save to API
+            apiCall('/admin/sdk-config', 'POST', sdkConfig);
+            
+            // Save to localStorage
+            localStorage.setItem('sdkConfig', JSON.stringify(sdkConfig));
+            
+            tg.showPopup({
+                title: 'Saved',
+                message: 'SDK configuration saved successfully.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+
+        // Load missions
+        function loadMissions() {
+            const missionList = document.getElementById('missionList');
+            missionList.innerHTML = '';
+            
+            missions.forEach(mission => {
+                const missionCard = document.createElement('div');
+                missionCard.className = 'mission-card';
+                
+                let progressHTML = '';
+                if (mission.type === 'daily') {
+                    progressHTML = `
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" ${mission.completed ? 'checked' : ''} 
+                                id="mission${mission.id}" onchange="completeMission(${mission.id})">
+                            <label class="form-check-label" for="mission${mission.id}">Complete</label>
+                        </div>
+                    `;
+                } else {
+                    progressHTML = `
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" 
+                                style="width: ${(mission.progress / mission.target) * 100}%" 
+                                aria-valuenow="${mission.progress}" aria-valuemin="0" aria-valuemax="${mission.target}">
+                            </div>
+                        </div>
+                        <small>${mission.progress}/${mission.target} completed</small>
+                        <button class="btn btn-sm btn-primary mt-2" onclick="claimMission(${mission.id})" 
+                            ${mission.completed ? 'disabled' : ''}>
+                            ${mission.completed ? 'Claimed' : 'Claim'}
+                        </button>
+                    `;
+                }
+                
+                missionCard.innerHTML = `
+                    <h5>${mission.title}</h5>
+                    <p>${mission.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Reward: ${mission.reward} USDT</span>
+                        ${progressHTML}
+                    </div>
+                `;
+                
+                missionList.appendChild(missionCard);
+            });
+        }
+        
+        // Complete mission
+        function completeMission(missionId) {
+            const mission = missions.find(m => m.id === missionId);
+            if (!mission) return;
+            
+            mission.completed = !mission.completed;
+            
+            if (mission.completed) {
+                userData.balance += mission.reward;
+                userData.experience += mission.reward * 100;
+                
+                userData.offerCompletions.push({
+                    offer: `Mission: ${mission.title}`,
+                    amount: mission.reward,
+                    date: new Date().toISOString()
+                });
+                
+                updateUI();
+                saveUserData();
+                
+                addNotification('Mission Completed!', `You received ${mission.reward} USDT for completing "${mission.title}" mission.`);
+                
+                tg.showPopup({
+                    title: 'Congratulations!',
+                    message: `You received ${mission.reward} USDT for completing the mission.`,
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        }
+        
+        // Claim mission
+        function claimMission(missionId) {
+            const mission = missions.find(m => m.id === missionId);
+            if (!mission || mission.completed) return;
+            
+            if (mission.progress >= mission.target) {
+                mission.completed = true;
+                
+                userData.balance += mission.reward;
+                userData.experience += mission.reward * 100;
+                
+                userData.offerCompletions.push({
+                    offer: `Mission: ${mission.title}`,
+                    amount: mission.reward,
+                    date: new Date().toISOString()
+                });
+                
+                updateUI();
+                saveUserData();
+                loadMissions();
+                
+                addNotification('Mission Claimed!', `You received ${mission.reward} USDT for completing "${mission.title}" mission.`);
+                
+                tg.showPopup({
+                    title: 'Congratulations!',
+                    message: `You received ${mission.reward} USDT for completing the mission.`,
+                    buttons: [{type: 'ok'}]
+                });
+            } else {
+                tg.showPopup({
+                    title: 'Not Completed',
+                    message: `You haven't completed this mission yet. Progress: ${mission.progress}/${mission.target}`,
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        }
+        
+        // Show ad
+        function showAd(adType, sdkUrl) {
+            tg.showPopup({
+                title: 'Watching Ad',
+                message: `Please watch the ad to earn ${rewardConfig[adType]} USDT.`,
+                buttons: [{type: 'ok'}]
+            });
+            
+            // Simulate ad watching and reward
+            setTimeout(() => {
+                userData.balance += rewardConfig[adType];
+                userData.experience += rewardConfig[adType] * 100;
+                
+                userData.offerCompletions.push({
+                    offer: `Ad: ${adType}`,
+                    amount: rewardConfig[adType],
+                    date: new Date().toISOString()
+                });
+                
+                // Update mission progress
+                const watchAdMission = missions.find(m => m.title === 'Watch 3 ads');
+                if (watchAdMission && !watchAdMission.completed) {
+                    watchAdMission.progress++;
+                    if (watchAdMission.progress >= watchAdMission.target) {
+                        watchAdMission.completed = true;
+                    }
+                }
+                
+                updateUI();
+                saveUserData();
+                loadMissions();
+                
+                addNotification('Ad Reward!', `You received ${rewardConfig[adType]} USDT for watching an ad.`);
+                
+                tg.showPopup({
+                    title: 'Congratulations!',
+                    message: `You received ${rewardConfig[adType]} USDT for watching the ad.`,
+                    buttons: [{type: 'ok'}]
+                });
+            }, 3000);
+        }
+        
+        // Show rewarded interstitial
+        function showRewardedInterstitial() {
+            showAd('RewardedInterstitial', sdkConfig.RewardedInterstitial);
+        }
+        
+        // Show rewarded popup
+        function showRewardedPopup() {
+            showAd('RewardedPopup', sdkConfig.RewardedPopup);
+        }
+        
+        // Show in-app interstitial
+        function showInAppInterstitial() {
+            showAd('InAppInterstitial', sdkConfig.InAppInterstitial);
+        }
+        
+        // Select withdraw method
+        function selectWithdrawMethod(method) {
+            const methodDetails = document.getElementById('methodDetails');
+            const methodLabel = document.getElementById('methodLabel');
+            const methodInput = document.getElementById('methodInput');
+            
+            methodDetails.classList.remove('d-none');
+            
+            switch(method) {
+                case 'bkash':
+                    methodLabel.textContent = 'bKash Number';
+                    methodInput.placeholder = '01XXXXXXXXX';
+                    methodInput.type = 'tel';
+                    break;
+                case 'nagad':
+                    methodLabel.textContent = 'Nagad Number';
+                    methodInput.placeholder = '01XXXXXXXXX';
+                    methodInput.type = 'tel';
+                    break;
+                case 'usdt':
+                    methodLabel.textContent = 'USDT (TRC20) Wallet Address';
+                    methodInput.placeholder = 'TXXXXXXXXXXXXXXX';
+                    methodInput.type = 'text';
+                    break;
+            }
+            
+            methodInput.dataset.method = method;
+        }
+        
+        // Process withdrawal
+        function processWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('methodInput').dataset.method;
+            const account = document.getElementById('methodInput').value;
+            
+            if (!amount || amount < 1) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Minimum withdrawal amount is 1 USDT.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            if (amount > userData.balance) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Insufficient balance.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            if (!account) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Please enter your account details.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            // Process withdrawal
+            userData.balance -= amount;
+            
+            const withdrawal = {
+                id: Date.now(),
+                amount: amount,
+                method: method,
+                account: account,
+                status: 'pending',
+                date: new Date().toISOString()
+            };
+            
+            userData.withdrawals.push(withdrawal);
+            
+            updateUI();
+            saveUserData();
+            loadWithdrawalHistory();
+            
+            addNotification('Withdrawal Request', `Your withdrawal request of ${amount} USDT has been submitted.`);
+            
+            tg.showPopup({
+                title: 'Success',
+                message: `Your withdrawal request of ${amount} USDT has been submitted. It will be processed within 24-48 hours.`,
+                buttons: [{type: 'ok'}]
+            });
+            
+            // Reset form
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('methodInput').value = '';
+            document.getElementById('methodDetails').classList.add('d-none');
+        }
+        
+        // Load withdrawal history
+        function loadWithdrawalHistory() {
+            const withdrawHistory = document.getElementById('withdrawHistory');
+            withdrawHistory.innerHTML = '';
+            
+            if (userData.withdrawals.length === 0) {
+                withdrawHistory.innerHTML = '<p>No withdrawal history found.</p>';
+                return;
+            }
+            
+            userData.withdrawals.slice().reverse().forEach(withdrawal => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                let methodText = '';
+                switch(withdrawal.method) {
+                    case 'bkash': methodText = 'bKash'; break;
+                    case 'nagad': methodText = 'Nagad'; break;
+                    case 'usdt': methodText = 'USDT'; break;
+                }
+                
+                const date = new Date(withdrawal.date).toLocaleDateString();
+                
+                historyItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${withdrawal.amount} USDT</strong>
+                            <br>
+                            <small>${methodText} - ${withdrawal.account}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-${withdrawal.status === 'completed' ? 'success' : 'warning'}">
+                                ${withdrawal.status}
+                            </span>
+                            <br>
+                            <small>${date}</small>
+                        </div>
+                    </div>
+                `;
+                
+                withdrawHistory.appendChild(historyItem);
+            });
+        }
+        
+        // Copy referral link
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            
+            tg.showPopup({
+                title: 'Copied',
+                message: 'Referral link copied to clipboard.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Share on Facebook
+        function shareOnFacebook() {
+            const text = `Earn USDT by watching ads! Use my referral link: ${document.getElementById('referralLink').value}`;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        // Share on WhatsApp
+        function shareOnWhatsApp() {
+            const text = `Earn USDT by watching ads! Use my referral link: ${document.getElementById('referralLink').value}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        // Share on Telegram
+        function shareOnTelegram() {
+            const text = `Earn USDT by watching ads! Use my referral link: ${document.getElementById('referralLink').value}`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(document.getElementById('referralLink').value)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        // Share on Twitter
+        function shareOnTwitter() {
+            const text = `Earn USDT by watching ads! Use my referral link: ${document.getElementById('referralLink').value}`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        // Check referral
+        function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('start');
+            
+            if (ref && ref !== userData.id.toString()) {
+                // This is a referral
+                const referrerId = parseInt(ref);
+                
+                // Check if this user was already referred
+                if (!userData.referrals.includes(referrerId)) {
+                    userData.referrals.push(referrerId);
+                    
+                    // Add notification
+                    addNotification('New Referral', 'You joined using a referral link. You will get bonus rewards!');
+                    
+                    // Save user data
+                    saveUserData();
+                    
+                    // Notify referrer via API
+                    apiCall('/user/referral', 'POST', {
+                        referrerId: referrerId,
+                        referredId: userData.id
+                    });
+                }
+            }
+            
+            loadReferralList();
+        }
+        
+        // Load referral list
+        function loadReferralList() {
+            const referralList = document.getElementById('referralList');
+            referralList.innerHTML = '';
+            
+            if (userData.referrals.length === 0) {
+                referralList.innerHTML = '<p>No referrals yet.</p>';
+                return;
+            }
+            
+            userData.referrals.forEach(referralId => {
+                const referralItem = document.createElement('div');
+                referralItem.className = 'history-item';
+                referralItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>User #${referralId}</strong>
+                            <br>
+                            <small>Joined via your referral link</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                `;
+                
+                referralList.appendChild(referralItem);
+            });
+        }
+        
+        // Send help request
+        function sendHelpRequest() {
+            const subject = document.getElementById('helpSubject').value;
+            const message = document.getElementById('helpMessage').value;
+            
+            if (!subject || !message) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Please fill all fields.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            // Save help request via API
+            apiCall('/help/request', 'POST', {
+                userId: userData.id,
+                subject: subject,
+                message: message,
+                date: new Date().toISOString()
+            });
+            
+            // Reset form
+            document.getElementById('helpSubject').value = '';
+            document.getElementById('helpMessage').value = '';
+            
+            tg.showPopup({
+                title: 'Sent',
+                message: 'Your question has been submitted. We will respond within 24 hours.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Toggle FAQ
+        function toggleFAQ(id) {
+            const faq = document.getElementById(`faq${id}`);
+            faq.classList.toggle('d-none');
+        }
+        
+        // Update profile
+        function updateProfile() {
+            const name = document.getElementById('userNameInput').value;
+            
+            if (!name) {
+                tg.showPopup({
+                    title: 'Error',
+                    message: 'Please enter your name.',
+                    buttons: [{type: 'ok'}]
+                });
+                return;
+            }
+            
+            const names = name.split(' ');
+            userData.first_name = names[0] || '';
+            userData.last_name = names.slice(1).join(' ') || '';
+            
+            document.getElementById('userName').textContent = name;
+            
+            saveUserData();
+            
+            tg.showPopup({
+                title: 'Updated',
+                message: 'Your profile has been updated.',
+                buttons: [{type: 'ok'}]
+            });
+        }
+        
+        // Check notifications
+        function checkNotifications() {
+            const notificationCount = document.getElementById('notificationCount');
+            
+            if (userData.notifications.length > 0) {
+                notificationCount.textContent = userData.notifications.length;
+                notificationCount.classList.remove('d-none');
+            } else {
+                notificationCount.classList.add('d-none');
+            }
+        }
+        
+        // Add notification
+        function addNotification(title, message) {
+            const notification = {
+                id: Date.now(),
+                title: title,
+                message: message,
+                date: new Date().toISOString(),
+                read: false
+            };
+            
+            userData.notifications.unshift(notification);
+            
+            checkNotifications();
+            saveUserData();
+        }
+        
+        // Show notifications
+        document.getElementById('notificationIcon').addEventListener('click', function() {
+            const notificationList = document.getElementById('notificationList');
+            notificationList.innerHTML = '';
+            
+            if (userData.notifications.length === 0) {
+                notificationList.innerHTML = '<p>No notifications.</p>';
+            } else {
+                userData.notifications.forEach(notification => {
+                    const notificationItem = document.createElement('div');
+                    notificationItem.className = 'history-item';
+                    
+                    const date = new Date(notification.date).toLocaleDateString();
+                    
+                    notificationItem.innerHTML = `
+                        <h6>${notification.title}</h6>
+                        <p>${notification.message}</p>
+                        <small>${date}</small>
+                    `;
+                    
+                    notificationList.appendChild(notificationItem);
+                    
+                    // Mark as read
+                    notification.read = true;
+                });
+                
+                // Update notification count
+                document.getElementById('notificationCount').classList.add('d-none');
+                userData.notifications = userData.notifications.map(n => ({...n, read: true}));
+                saveUserData();
+            }
+            
+            const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            notificationModal.show();
+        });
+        
+        // Load help requests (Admin)
+        function loadHelpRequests() {
+            // This would typically load from API
+            const helpRequests = document.getElementById('helpRequests');
+            helpRequests.innerHTML = '<p>No help requests.</p>';
+        }
+        
+        // Update UI
+        function updateUI() {
+            document.getElementById('userBalance').textContent = userData.balance.toFixed(4);
+            document.getElementById('totalEarnings').textContent = userData.offerCompletions
+                .reduce((sum, offer) => sum + offer.amount, 0)
+                .toFixed(4);
+            document.getElementById('totalReferrals').textContent = userData.referrals.length;
+            document.getElementById('totalOffers').textContent = userData.offerCompletions.length;
+            document.getElementById('userLevel').textContent = userData.level;
+            
+            loadRewardHistory();
+            loadWithdrawalHistory();
+            checkNotifications();
+        }
+        
+        // Load reward history
+        function loadRewardHistory() {
+            const rewardHistory = document.getElementById('rewardHistory');
+            rewardHistory.innerHTML = '';
+            
+            if (userData.offerCompletions.length === 0) {
+                rewardHistory.innerHTML = '<p>No reward history found.</p>';
+                return;
+            }
+            
+            userData.offerCompletions.slice().reverse().forEach(offer => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const date = new Date(offer.date).toLocaleDateString();
+                
+                historyItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${offer.offer}</strong>
+                            <br>
+                            <small>${date}</small>
+                        </div>
+                        <div>
+                            <span class="text-success">+${offer.amount} USDT</span>
+                        </div>
+                    </div>
+                `;
+                
+                rewardHistory.appendChild(historyItem);
+            });
+        }
+    </script>
+</body>
+</html>
